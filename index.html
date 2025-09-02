@@ -65,24 +65,41 @@
                 modal.classList.remove('hidden');
                 
                 // ปุ่ม "เปิดเบราว์เซอร์"
-                confirmButton.addEventListener('click', () => {
-                    const ua = navigator.userAgent.toLowerCase();
+                // confirmButton.addEventListener('click', () => {
+                //     const ua = navigator.userAgent.toLowerCase();
 
-                    if (/android/i.test(ua)) {
-                        // ✅ Android → เปิด Chrome ด้วย intent:// และ fallback
-                        window.location.href =
-                          "intent://" + finalUrl.replace(/^https?:\/\//, "") +
-                          "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
-                          encodeURIComponent(finalUrl) + ";end";
-                    } else if (/iphone|ipad|ipod/i.test(ua)) {
-                        // ✅ iOS → เปิด Safari โดยตรง
-                        window.location.href = finalUrl;
-                    } else {
-                        // ✅ Desktop หรือเบราว์เซอร์ปกติ
-                        window.location.href = finalUrl;
-                    }
-                });
+                //     if (/android/i.test(ua)) {
+                //         // ✅ Android → เปิด Chrome ด้วย intent:// และ fallback
+                //         window.location.href =
+                //           "intent://" + finalUrl.replace(/^https?:\/\//, "") +
+                //           "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+                //           encodeURIComponent(finalUrl) + ";end";
+                //     } else if (/iphone|ipad|ipod/i.test(ua)) {
+                //         // ✅ iOS → เปิด Safari โดยตรง
+                //         window.location.href = finalUrl;
+                //     } else {
+                //         // ✅ Desktop หรือเบราว์เซอร์ปกติ
+                //         window.location.href = finalUrl;
+                //     }
+                // });
+confirmButton.addEventListener('click', () => {
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbx1234567890/exec";
+    const ua = navigator.userAgent.toLowerCase();
 
+    if (/android/i.test(ua)) {
+        // Android → Chrome
+        window.location.href =
+          "intent://" + webAppUrl.replace(/^https?:\/\//, "") +
+          "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+          encodeURIComponent(webAppUrl) + ";end";
+    } else if (/iphone|ipad|ipod/i.test(ua)) {
+        // iOS → Safari
+        window.location.href = webAppUrl;
+    } else {
+        // Desktop → ปกติ
+        window.location.href = webAppUrl;
+    }
+});
                 // ปุ่ม "คัดลอกลิงก์"
                 copyLinkButton.addEventListener('click', async () => {
                     try {
@@ -136,3 +153,4 @@
     <iframe id="mainIframe" style="width: 100%; height: 100vh;" scrolling="yes" src="" frameborder="0"></iframe>
 </body>
 </html>
+
