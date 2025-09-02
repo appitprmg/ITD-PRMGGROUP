@@ -26,23 +26,21 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // URL ของเว็บแอป (สามารถแก้ไขได้ที่นี่)
+            // URL ของเว็บแอป
             const web_app_url = 'https://script.google.com/macros/s/AKfycbySHO5I0y-XbznETCHqR9b1SUxCa55acRTJQRL50k-85CiD1qX6sI9wOT3D6ao44_iKgQ/exec';
 
-            // ฟังก์ชันสำหรับตรวจสอบ User Agent ของ In-App Browser
+            // ฟังก์ชันตรวจสอบ In-App Browser
             function is_InAppBrowser() {
                 const userAgent = navigator.userAgent || navigator.vendor || window.opera;
                 return (
-                    // เพิ่มการตรวจสอบสำหรับแอปฯ ยอดนิยมอื่นๆ
                     /FBAV|FBAN|LINE|Tiktok|Instagram|Twitter|Snapchat|Telegram|MicroMessenger|Pinterest|Reddit|Threads/i.test(userAgent) || 
-                    // ตรวจสอบเพิ่มเติมสำหรับ iOS In-App Browser
                     (
                         /CriOS/.test(userAgent) && /Safari/.test(userAgent)
                     )
                 );
             }
 
-            // กำหนด src ของ iframe โดยใช้ตัวแปร
+            // กำหนด src ของ iframe
             document.getElementById('mainIframe').src = web_app_url;
             
             const urlParams = new URLSearchParams(window.location.search);
@@ -58,25 +56,40 @@
                 const copyLinkButton = document.getElementById('copyLinkButton');
                 const copyMessage = document.getElementById('copyMessage');
 
-                // สร้าง URL ที่มีพารามิเตอร์ openExternalBrowser สำหรับการเปิดเบราว์เซอร์หลัก
+                // URL ที่จะ redirect (เพิ่มพารามิเตอร์ openExternalBrowser)
                 const urlToRedirect = new URL(window.location.href);
                 urlToRedirect.searchParams.set('openExternalBrowser', '1');
+                const finalUrl = urlToRedirect.toString();
 
                 // แสดง Modal
                 modal.classList.remove('hidden');
                 
+                // ปุ่ม "เปิดเบราว์เซอร์"
                 confirmButton.addEventListener('click', () => {
-                    window.location.href = urlToRedirect.toString();
+                    const ua = navigator.userAgent.toLowerCase();
+
+                    if (/android/i.test(ua)) {
+                        // Android → บังคับเปิด Chrome
+                        window.location.href =
+                          "intent://" + finalUrl.replace(/^https?:\/\//, "") +
+                          "#Intent;scheme=https;package=com.android.chrome;end";
+                    } else if (/iphone|ipad|ipod/i.test(ua)) {
+                        // iOS → เปิด Safari
+                        window.open(finalUrl, "_blank");
+                    } else {
+                        // Desktop หรือเบราว์เซอร์ปกติ
+                        window.location.href = finalUrl;
+                    }
                 });
 
+                // ปุ่ม "คัดลอกลิงก์"
                 copyLinkButton.addEventListener('click', async () => {
                     try {
-                        // คัดลอก URL ที่มีพารามิเตอร์
-                        await navigator.clipboard.writeText(urlToRedirect.toString());
+                        await navigator.clipboard.writeText(finalUrl);
                         copyMessage.classList.remove('hidden');
                         setTimeout(() => {
                             copyMessage.classList.add('hidden');
-                        }, 2000); // ซ่อนข้อความหลังจาก 2 วินาที
+                        }, 2000);
                     } catch (err) {
                         console.error('Failed to copy text: ', err);
                     }
@@ -91,7 +104,6 @@
         <div class="bg-white rounded-none sm:rounded-lg shadow-none sm:shadow-xl w-full h-full sm:max-w-sm sm:h-auto p-6 flex flex-col justify-between text-center">
             <div>
                 <div class="flex flex-col items-center justify-center mb-6">
-                    <!-- ไอคอนหัวใจจาก Font Awesome -->
                     <i class="fa-solid fa-heart text-red-500 text-5xl mb-4"></i>
                 </div>
                 
@@ -119,10 +131,7 @@
         </div>
     </div>
 
-    <!-- ส่วนของ iframe ที่จะแสดงเนื้อหาหลัก -->
+    <!-- ส่วนของ iframe -->
     <iframe id="mainIframe" style="width: 100%; height: 100vh;" scrolling="yes" src="" frameborder="0"></iframe>
 </body>
 </html>
-
-
-
