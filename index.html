@@ -69,15 +69,16 @@
                     const ua = navigator.userAgent.toLowerCase();
 
                     if (/android/i.test(ua)) {
-                        // Android → บังคับเปิด Chrome
+                        // ✅ Android → เปิด Chrome ด้วย intent:// และ fallback
                         window.location.href =
                           "intent://" + finalUrl.replace(/^https?:\/\//, "") +
-                          "#Intent;scheme=https;package=com.android.chrome;end";
+                          "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" +
+                          encodeURIComponent(finalUrl) + ";end";
                     } else if (/iphone|ipad|ipod/i.test(ua)) {
-                        // iOS → เปิด Safari
-                        window.open(finalUrl, "_blank");
+                        // ✅ iOS → เปิด Safari โดยตรง
+                        window.location.href = finalUrl;
                     } else {
-                        // Desktop หรือเบราว์เซอร์ปกติ
+                        // ✅ Desktop หรือเบราว์เซอร์ปกติ
                         window.location.href = finalUrl;
                     }
                 });
